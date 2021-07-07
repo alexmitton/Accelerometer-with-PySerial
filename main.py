@@ -17,12 +17,6 @@ except:
     import pip
     pip.main(['install','matplotlib'])
     import matplotlib.pyplot as plt
-try:
-    from alive_progress import alive_bar
-except:
-    import pip
-    pip.main(['install','alive-progress'])
-    from alive_progress import alive_bar
 import time, sys
 
 # DEFINE FUNCTIONS
@@ -97,7 +91,7 @@ def plotValues(accelValues,duration,delay=0.1):
     ax3.set_xlabel('Time (s)')
     plt.show()
 
-    return None
+    return xVals, yVals, zVals
 
 # DEFINE PARAMETERS
 Tdelay = 0.1 # this should match value in Arduino code
@@ -114,4 +108,17 @@ time.sleep(1.5)
 
 accelValsArray = collectData(duration,Tdelay,nVals)
 
-plotValues(accelValsArray,duration,Tdelay)
+xVals, yVals, zVals = plotValues(accelValsArray,duration,Tdelay)
+
+
+# BELOW FREQUENCY ANALYSIS IS NOT RIGHT - read up about this again
+fft_xVals = np.fft.fft(xVals)/len(xVals)
+fft_xVals = fft_xVals[range(int(len(xVals)/2))]
+#fft_yVals = np.fft.fftshift(np.fft.fft(yVals))
+#fft_zVals = np.fft.fftshift(np.fft.fft(zVals))
+
+fVals = np.arange(int(len(xVals)/2))
+frequencies = (fVals*(1/Tdelay))/len(xVals)
+
+plt.plot(frequencies,abs(fft_xVals))
+plt.show()
