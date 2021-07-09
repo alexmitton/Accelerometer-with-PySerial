@@ -111,14 +111,17 @@ accelValsArray = collectData(duration,Tdelay,nVals)
 xVals, yVals, zVals = plotValues(accelValsArray,duration,Tdelay)
 
 
-# BELOW FREQUENCY ANALYSIS IS NOT RIGHT - read up about this again
-fft_xVals = np.fft.fft(xVals)/len(xVals)
-fft_xVals = fft_xVals[range(int(len(xVals)/2))]
+# BELOW FREQUENCY ANALYSIS IS NOT RIGHT - TRY NOW WITH NEW DATA
+# ALSO SAVE SOME EXAMPLE DATA TO FILE SO CAN TRY OFFSITE
+xfftVals = np.fft.fft(xVals,nIterations)
+xPSD = xfftVals * (np.conj(xfftVals)/nIterations)
 #fft_yVals = np.fft.fftshift(np.fft.fft(yVals))
 #fft_zVals = np.fft.fftshift(np.fft.fft(zVals))
 
-fVals = np.arange(int(len(xVals)/2))
-frequencies = (fVals*(1/Tdelay))/len(xVals)
+freqs = (1/(duration))*np.arange(nIterations)
+L = np.arange(1,np.floor(nIterations/2),dtype='int')
 
-plt.plot(frequencies,abs(fft_xVals))
+plt.plot(freqs[L],xfftVals[L])
+# OR plt.plot(freqs[L],xPSD[L])
+plt.xlim(freqs[L[0]],freqs[L[-1]])
 plt.show()
