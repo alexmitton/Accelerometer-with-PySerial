@@ -9,8 +9,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import struct
 import copy
-#import pandas as pd
-
+import os
+try:
+    import pandas as pd
+except:
+    import pip
+    pip.main(['install','pandas'])
+    import pandas as pd
 
 class serialPlot:
     def __init__(self, serialPort='/dev/cu.usbmodem142301', serialBaud=38400, plotLength=100, dataNumBytes=2, numPlots=1):
@@ -33,7 +38,7 @@ class serialPlot:
         self.thread = None
         self.plotTimer = 0
         self.previousTimer = 0
-        # self.csvData = []
+        self.csvData = []
 
         print('Trying to connect to: ' + str(serialPort) + ' at ' + str(serialBaud) + ' BAUD.')
         try:
@@ -62,7 +67,7 @@ class serialPlot:
             self.data[i].append(value)    # we get the latest data point and append it to our array
             lines[i].set_data(range(self.plotMaxLength), self.data[i])
             lineValueText[i].set_text('[' + lineLabel[i] + '] = ' + str(value))
-        # self.csvData.append([self.data[0][-1], self.data[1][-1], self.data[2][-1]])
+        self.csvData.append([self.data[0][-1], self.data[1][-1], self.data[2][-1]])
 
     def backgroundThread(self):    # retrieve data
         time.sleep(1.0)  # give some buffer time for retrieving data
@@ -77,8 +82,9 @@ class serialPlot:
         self.thread.join()
         self.serialConnection.close()
         print('Disconnected...')
-        # df = pd.DataFrame(self.csvData)
-        # df.to_csv('/home/rikisenia/Desktop/data.csv')
+        df = pd.DataFrame(self.csvData)
+        file_path = os.path.join('data')
+        df.to_csv(file_path)
 
 def main():
     portName = '/dev/cu.usbmodem142301'
