@@ -1,3 +1,4 @@
+# TO BE USED W/ ARDUINO CODE "MPU-6050-RAW.ino"
 # IMPORT LIBRARIES
 try:
     import serial
@@ -100,8 +101,8 @@ nVals = 3
 nIterations = int(duration/Tdelay)
 
 # establishes serial communication port - first for input 1, second for 2
-#ser = serial.Serial('/dev/cu.usbmodem142301',baudrate=9600,timeout=1)
-ser = serial.Serial('/dev/cu.usbmodem141301',baudrate=9600,timeout=1)
+ser = serial.Serial('/dev/cu.usbmodem142301',baudrate=230400,timeout=1)
+#ser = serial.Serial('/dev/cu.usbmodem141301',baudrate=9600,timeout=1)
 
 # allow time on start up to be extra cautious to avoid errors
 time.sleep(1.5)
@@ -110,8 +111,8 @@ accelValsArray = collectData(duration,Tdelay,nVals)
 
 xVals, yVals, zVals = plotValues(accelValsArray,duration,Tdelay)
 
-
-# BELOW FREQUENCY ANALYSIS IS NOT RIGHT - TRY NOW WITH NEW DATA
+'''
+# BELOW FREQUENCY ANALYSIS IS NOT RIGHT - TRY NOW WITH NEW DATA (based on https://www.youtube.com/watch?v=s2K1JfNR7Sc)
 # ALSO SAVE SOME EXAMPLE DATA TO FILE SO CAN TRY OFFSITE
 xfftVals = np.fft.fft(xVals,nIterations)
 xPSD = xfftVals * (np.conj(xfftVals)/nIterations)
@@ -121,7 +122,8 @@ xPSD = xfftVals * (np.conj(xfftVals)/nIterations)
 freqs = (1/(duration))*np.arange(nIterations)
 L = np.arange(1,np.floor(nIterations/2),dtype='int')
 
-plt.plot(freqs[L],xfftVals[L])
-# OR plt.plot(freqs[L],xPSD[L])
+#plt.plot(freqs[L],xfftVals[L])
+plt.plot(freqs[L],xPSD[L])
 plt.xlim(freqs[L[0]],freqs[L[-1]])
 plt.show()
+'''
