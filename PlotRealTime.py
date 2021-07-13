@@ -43,9 +43,9 @@ class serialPlot:
         print('Trying to connect to: ' + str(serialPort) + ' at ' + str(serialBaud) + ' BAUD.')
         try:
             self.serialConnection = serial.Serial(serialPort, serialBaud, timeout=4)
-            print('Connected to ' + str(serialPort) + ' at ' + str(serialBaud) + ' BAUD.')
+            print('-'*50,'\nConnected to: ' + str(serialPort) + ' at ' + str(serialBaud) + ' BAUD.')
         except:
-            print("Failed to connect with " + str(serialPort) + ' at ' + str(serialBaud) + ' BAUD.')
+            print("Failed to connect to: " + str(serialPort) + ' at ' + str(serialBaud) + ' BAUD.')
 
     def readSerialStart(self):
         if self.thread == None:
@@ -81,27 +81,36 @@ class serialPlot:
         self.isRun = False
         self.thread.join()
         self.serialConnection.close()
-        print('Disconnected...')
-        df = pd.DataFrame(self.csvData)
-        dirPath=os.getcwd()+'/data/'
-        outputFileName = "data_#.csv"
-        outputVersion = 1
-        while os.path.isfile(dirPath+outputFileName.replace("#", str(outputVersion))):
-            outputVersion += 1
-        outputFileName = outputFileName.replace("#", str(outputVersion))
-        #df.to_csv(dirPath+outputFileName) # uncomment to save csv data to folder
+        print('Disconnected\n' + '-' * 50)
+
+        saveQuery = input("Save data as .csv? (y/n)\n")
+        if saveQuery == 'y':
+            df = pd.DataFrame(self.csvData)
+            dirPath=os.getcwd()+'/data/'
+            outputFileName = "data_#.csv"
+            outputVersion = 1
+            while os.path.isfile(dirPath+outputFileName.replace("#", str(outputVersion))):
+                outputVersion += 1
+            outputFileName = outputFileName.replace("#", str(outputVersion))
+            try:
+                df.to_csv(dirPath+outputFileName)
+                print('Data saved to ' + dirPath + outputFileName)
+            except:
+                print('Failed to save data.')
+        else:
+            print('Data discarded!')
 
 def main():
     portName = '/dev/cu.usbmodem142301'
     baudRate = 115200
-    maxPlotLength = 300     # number of points in x-axis of real time plot
+    maxPlotLength = 500     # number of points in x-axis of real time plot
     dataNumBytes = 4        # number of bytes of 1 data point
     numPlots = 3            # number of plots in 1 graph
     s = serialPlot(portName, baudRate, maxPlotLength, dataNumBytes, numPlots)   # initializes all required variables
     s.readSerialStart()                                               # starts background thread
 
     # plotting starts below
-    pltInterval = 3    # Period at which the plot animation updates [ms]
+    pltInterval = 5    # Period at which the plot animation updates [ms]
     xmin = 0
     xmax = maxPlotLength
     ymin = -(20)
