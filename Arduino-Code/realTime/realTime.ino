@@ -1,10 +1,14 @@
+// Accel parts taken from: https://howtomechatronics.com/tutorials/arduino/arduino-and-mpu6050-accelerometer-and-gyroscope-tutorial/
+// Send to Python parts taken from: https://thepoorengineer.com/en/arduino-python-plot/#arduino
+
 unsigned long timer = 0;
 long loopTime = 500;   // microseconds
 
 #include<Wire.h>
 const int MPU_addr=0x68;  // I2C address of the MPU-6050
-int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+double AcX,AcY,AcZ,GyX,GyY,GyZ;
 char userInput;
+float g = 9.81;
 
 void setup() {
   Wire.begin();
@@ -22,18 +26,19 @@ void loop() {
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU_addr,14,true);  // request a total of 14 registers
-  double xval = (Wire.read()<<8|Wire.read())+700 ;  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)   
-  double yval = (Wire.read()<<8|Wire.read())+250;  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  double zval = (Wire.read()<<8|Wire.read())-16700;  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  sendToPC(&xval, &yval, &zval);
+  Wire.requestFrom(MPU_addr,6,true);  // Read 6 registers total, each axis value is stored in 2 registers
+  //For a range of +-2g we divide raw values by 16384 according to datasheet
+  AcX = (Wire.read()<<8|Wire.read()) * (g/16384.0) ;  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)   
+  AcY = (Wire.read()<<8|Wire.read()) * (g/16384.0) ; // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  AcZ = (Wire.read()<<8|Wire.read()) * (g/16384.0) ; // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  sendToPC(&AcX, &AcY, &AcZ);
 }
 
 void timeSync(unsigned long deltaT)
 {
   unsigned long currTime = micros();
   long timeToDelay = deltaT - (currTime - timer);
-  if (timeToDelay > 5000)
+  if (timeToDelay > loopTime) // or 5000
   {
     delay(timeToDelay / 1000);
     delayMicroseconds(timeToDelay % 1000);

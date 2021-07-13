@@ -83,8 +83,13 @@ class serialPlot:
         self.serialConnection.close()
         print('Disconnected...')
         df = pd.DataFrame(self.csvData)
-        file_path = os.path.join('data')
-        df.to_csv(file_path)
+        dirPath=os.getcwd()+'/data/'
+        outputFileName = "data_#.csv"
+        outputVersion = 1
+        while os.path.isfile(dirPath+outputFileName.replace("#", str(outputVersion))):
+            outputVersion += 1
+        outputFileName = outputFileName.replace("#", str(outputVersion))
+        df.to_csv(dirPath+outputFileName)
 
 def main():
     portName = '/dev/cu.usbmodem142301'
@@ -99,13 +104,13 @@ def main():
     pltInterval = 50    # Period at which the plot animation updates [ms]
     xmin = 0
     xmax = maxPlotLength
-    ymin = -(20000)
-    ymax = 20000
+    ymin = -(20)
+    ymax = 20
     fig = plt.figure(figsize=(10, 8))
     ax = plt.axes(xlim=(xmin, xmax), ylim=(float(ymin - (ymax - ymin) / 10), float(ymax + (ymax - ymin) / 10)))
     ax.set_title('Arduino Accelerometer')
     ax.set_xlabel("Time")
-    ax.set_ylabel("Accelerometer Output")
+    ax.set_ylabel("Accelerometer Output (g)")
 
     lineLabel = ['X', 'Y', 'Z']
     style = ['r-', 'c-', 'b-']  # linestyles for the different plots
