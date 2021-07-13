@@ -2,7 +2,7 @@
 // Send to Python parts taken from: https://thepoorengineer.com/en/arduino-python-plot/#arduino
 
 unsigned long timer = 0;
-long loopTime = 500;   // microseconds
+long loopTime = 50;   // microseconds
 
 #include<Wire.h>
 const int MPU_addr=0x68;  // I2C address of the MPU-6050
@@ -16,7 +16,7 @@ void setup() {
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
-  Serial.begin(38400);
+  Serial.begin(115200);
   timer = micros();
 }
 

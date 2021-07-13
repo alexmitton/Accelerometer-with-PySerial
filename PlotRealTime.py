@@ -18,7 +18,7 @@ except:
     import pandas as pd
 
 class serialPlot:
-    def __init__(self, serialPort='/dev/cu.usbmodem142301', serialBaud=38400, plotLength=100, dataNumBytes=2, numPlots=1):
+    def __init__(self, serialPort='/dev/cu.usbmodem142301', serialBaud=115200, plotLength=100, dataNumBytes=2, numPlots=1):
         self.port = serialPort
         self.baud = serialBaud
         self.plotMaxLength = plotLength
@@ -89,19 +89,19 @@ class serialPlot:
         while os.path.isfile(dirPath+outputFileName.replace("#", str(outputVersion))):
             outputVersion += 1
         outputFileName = outputFileName.replace("#", str(outputVersion))
-        df.to_csv(dirPath+outputFileName)
+        #df.to_csv(dirPath+outputFileName) # uncomment to save csv data to folder
 
 def main():
     portName = '/dev/cu.usbmodem142301'
-    baudRate = 38400
-    maxPlotLength = 100     # number of points in x-axis of real time plot
+    baudRate = 115200
+    maxPlotLength = 300     # number of points in x-axis of real time plot
     dataNumBytes = 4        # number of bytes of 1 data point
     numPlots = 3            # number of plots in 1 graph
     s = serialPlot(portName, baudRate, maxPlotLength, dataNumBytes, numPlots)   # initializes all required variables
     s.readSerialStart()                                               # starts background thread
 
     # plotting starts below
-    pltInterval = 50    # Period at which the plot animation updates [ms]
+    pltInterval = 3    # Period at which the plot animation updates [ms]
     xmin = 0
     xmax = maxPlotLength
     ymin = -(20)
