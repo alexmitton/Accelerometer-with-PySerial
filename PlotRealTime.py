@@ -67,7 +67,7 @@ class serialPlot:
             self.data[i].append(value)    # we get the latest data point and append it to our array
             lines[i].set_data(range(self.plotMaxLength), self.data[i])
             lineValueText[i].set_text('[' + lineLabel[i] + '] = ' + str(value))
-        self.csvData.append([self.data[0][-1], self.data[1][-1], self.data[2][-1]])
+        self.csvData.append([self.data[0][-1], self.data[1][-1], self.data[2][-1], self.data[3][-1], self.data[4][-1], self.data[5][-1]])
 
     def backgroundThread(self):    # retrieve data
         time.sleep(1.0)  # give some buffer time for retrieving data
@@ -83,7 +83,7 @@ class serialPlot:
         self.serialConnection.close()
         print('Disconnected\n' + '-' * 50)
 
-        saveQuery = input("Save data as .csv? (y/n)\n")
+        saveQuery = input("Save accelerometer data as .csv? (y/n)\n")
         if saveQuery == 'y':
             df = pd.DataFrame(self.csvData)
             dirPath=os.getcwd()+'/data/'
@@ -105,7 +105,7 @@ def main():
     baudRate = 115200
     maxPlotLength = 500     # number of points in x-axis of real time plot
     dataNumBytes = 4        # number of bytes of 1 data point
-    numPlots = 3            # number of plots in 1 graph
+    numPlots = 6            # number of plots in 1 graph
     s = serialPlot(portName, baudRate, maxPlotLength, dataNumBytes, numPlots)   # initializes all required variables
     s.readSerialStart()                                               # starts background thread
 
@@ -113,16 +113,15 @@ def main():
     pltInterval = 5    # Period at which the plot animation updates [ms]
     xmin = 0
     xmax = maxPlotLength
-    ymin = -(20)
-    ymax = 20
+    ymin = -(100)
+    ymax = 100
     fig = plt.figure(figsize=(10, 8))
     ax = plt.axes(xlim=(xmin, xmax), ylim=(float(ymin - (ymax - ymin) / 10), float(ymax + (ymax - ymin) / 10)))
     ax.set_title('Arduino Accelerometer')
     ax.set_xlabel("Time")
-    ax.set_ylabel("Accelerometer Output (g)")
-
-    lineLabel = ['X', 'Y', 'Z']
-    style = ['r-', 'c-', 'b-']  # linestyles for the different plots
+    ax.set_ylabel("Accelerometer Output (m/s^2)")
+    lineLabel = ['Acc X', 'Acc Y', 'Acc Z', 'Angle X', 'Angle Y', 'Angle Z']
+    style = ['r-', 'g-', 'b-', 'c-', 'm-', 'y-']  # linestyles for the different plots
     timeText = ax.text(0.70, 0.95, '', transform=ax.transAxes)
     lines = []
     lineValueText = []
